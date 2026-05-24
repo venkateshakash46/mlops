@@ -3,43 +3,51 @@ from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def home():
-    return {"message": "Hello"}
-
-@app.get("/predict-page", response_class=HTMLResponse)
-def predict_page():
 
     return """
     <html>
         <body>
-            <h1>Prediction Page</h1>
 
-            <button onclick="sendRequest()">
+            <h1>Flower Prediction</h1>
+
+            <input type="text" id="flower" placeholder="Enter flower">
+
+            <button onclick="predict()">
                 Predict
             </button>
 
-            <p id="result"></p>
+            <h2 id="result"></h2>
 
             <script>
-                async function sendRequest() {
+
+                async function predict() {
+
+                    let flower_name =
+                        document.getElementById("flower").value;
 
                     const response = await fetch('/predict', {
+
                         method: 'POST',
+
                         headers: {
                             'Content-Type': 'application/json'
                         },
+
                         body: JSON.stringify({
-                            flower: 'iris'
+                            flower: flower_name
                         })
                     });
 
                     const data = await response.json();
 
-                    document.getElementById('result').innerText =
-                        data.prediction;
+                    document.getElementById("result").innerText =
+                        "Prediction: " + data.prediction;
                 }
+
             </script>
+
         </body>
     </html>
     """
@@ -47,7 +55,8 @@ def predict_page():
 @app.post("/predict")
 def predict(data: dict):
 
+    flower = data["flower"]
+
     return {
-        "prediction": "venkatesh",
-        "received_data": data
+        "prediction": flower.upper()
     }
