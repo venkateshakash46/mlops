@@ -9,6 +9,6 @@ def home():
 @app.post("/predict")
 def predict(data: dict):
     return {
-        "prediction": "setosa",
+        "prediction": "venkatesh",
         "received_data": data
     }
