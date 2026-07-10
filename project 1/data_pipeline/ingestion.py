@@ -12,7 +12,7 @@ class Ingestion:
     def __init__(self, url,locations_ids):
         self.locations_ids = locations_ids
         self.url     = url
-        self.api_key = "87845088304907dbb3dd787b22ac7c420a216c75c898eb4e459a40e446a6abcd"
+        self.api_key = "Your API Key"
         self.headers = {"X-API-Key": self.api_key}
 
 
