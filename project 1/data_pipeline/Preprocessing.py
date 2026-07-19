@@ -265,8 +265,7 @@ class Preprocessing:
         self.aggregate_city_level()
         self.AQI_Class_Labeler()
 
-
-p = Preprocessing(r'D:\Arise\python\Mlops\project 1\data_pipeline\1common_sensors_long.csv')
+p = Preprocessing("data/sensor_data.csv")  # use valid file name
 p.run()
 
 
