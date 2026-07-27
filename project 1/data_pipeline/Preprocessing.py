@@ -8,14 +8,20 @@ class Preprocessing:
 
     def type_converter(self):
 
+        self.sensor_data['utc_DateTimeFrom'] = pd.to_datetime(self.sensor_data['utc_DateTimeFrom'],
+                                                              utc=True).dt.tz_convert(None)
+        self.sensor_data['utc_DateTimeTo'] = pd.to_datetime(self.sensor_data['utc_DateTimeTo'], utc=True).dt.tz_convert(
+            None)
+        self.sensor_data['local_DateTimeFrom'] = pd.to_datetime(self.sensor_data['local_DateTimeFrom'],
+                                                                utc=True).dt.tz_convert(None)
+        self.sensor_data['local_DateTimeTo'] = pd.to_datetime(self.sensor_data['local_DateTimeTo'],
+                                                              utc=True).dt.tz_convert(None)
+
         self.sensor_data['sensor_id'] = pd.to_numeric(self.sensor_data['sensor_id'], errors='coerce').astype('Int64')
         self.sensor_data['location_id'] = pd.to_numeric(self.sensor_data['location_id'], errors='coerce').astype('Int64')
         self.sensor_data['value'] = pd.to_numeric(self.sensor_data['value'], errors='coerce')
         self.sensor_data['page'] = pd.to_numeric(self.sensor_data['page'], errors='coerce').astype('Int64')
-        self.sensor_data['utc_DateTimeFrom'] = pd.to_datetime(self.sensor_data['utc_DateTimeFrom']).dt.tz_localize(None)
-        self.sensor_data['utc_DateTimeTo'] = pd.to_datetime(self.sensor_data['utc_DateTimeTo']).dt.tz_localize(None)
-        self.sensor_data['local_DateTimeFrom'] = pd.to_datetime(self.sensor_data['local_DateTimeFrom']).dt.tz_localize(None)
-        self.sensor_data['local_DateTimeTo'] = pd.to_datetime(self.sensor_data['local_DateTimeTo']).dt.tz_localize(None)
+
         self.sensor_data['sensor_name'] = self.sensor_data['sensor_name'].astype(str)
 
         print("****** type_converter done *******")
@@ -105,6 +111,8 @@ class Preprocessing:
             'wind_direction deg': 'mean'
         }
 
+        agg_dict = {k: v for k, v in agg_dict.items() if k in self.df_wide.columns}
+
         self.df_city = (
             self.df_wide
             .groupby("utc_DateTimeFrom", as_index=False)
@@ -118,67 +126,67 @@ class Preprocessing:
         BREAKPOINTS = {
             'pm25 µg/m³': [
                 (0, 30, 0, 50),
-                (31, 60, 51, 100),
-                (61, 90, 101, 200),
-                (91, 120, 201, 300),
-                (121, 250, 301, 400),
-                (251, 9999, 401, 500)
+                (30, 60, 50, 100),
+                (60, 90, 100, 200),
+                (90, 120, 200, 300),
+                (120, 250, 300, 400),
+                (250, 9999, 400, 500)
             ],
             'pm10 µg/m³': [
                 (0, 50, 0, 50),
-                (51, 100, 51, 100),
-                (101, 250, 101, 200),
-                (251, 350, 201, 300),
-                (351, 430, 301, 400),
-                (431, 9999, 401, 500)
+                (50, 100, 50, 100),
+                (100, 250, 100, 200),
+                (250, 350, 200, 300),
+                (350, 430, 300, 400),
+                (430, 9999, 400, 500)
             ],
             'no2 ppb': [
                 (0, 21, 0, 50),
-                (22, 43, 51, 100),
-                (44, 96, 101, 200),
-                (97, 149, 201, 300),
-                (150, 213, 301, 400),
-                (214, 9999, 401, 500)
+                (21, 43, 50, 100),
+                (43, 96, 100, 200),
+                (96, 149, 200, 300),
+                (149, 213, 300, 400),
+                (213, 9999, 400, 500)
             ],
             'so2 ppb': [
                 (0, 15, 0, 50),
-                (16, 31, 51, 100),
-                (32, 145, 101, 200),
-                (146, 305, 201, 300),
-                (306, 611, 301, 400),
-                (612, 9999, 401, 500)
+                (15, 31, 50, 100),
+                (31, 145, 100, 200),
+                (145, 305, 200, 300),
+                (305, 611, 300, 400),
+                (611, 9999, 400, 500)
             ],
             'o3 µg/m³': [
                 (0, 50, 0, 50),
-                (51, 100, 51, 100),
-                (101, 168, 101, 200),
-                (169, 208, 201, 300),
-                (209, 748, 301, 400),
-                (749, 9999, 401, 500)
+                (50, 100, 50, 100),
+                (100, 168, 100, 200),
+                (168, 208, 200, 300),
+                (208, 748, 300, 400),
+                (748, 9999, 400, 500)
             ],
             'co ppb': [
                 (0, 873, 0, 50),
-                (874, 1746, 51, 100),
-                (1747, 8732, 101, 200),
-                (8733, 14845, 201, 300),
-                (14846, 29690, 301, 400),
-                (29691, 99999, 401, 500)
+                (873, 1746, 50, 100),
+                (1746, 8732, 100, 200),
+                (8732, 14845, 200, 300),
+                (14845, 29690, 300, 400),
+                (29690, 99999, 400, 500)
             ],
             'no ppb': [
                 (0, 33, 0, 50),
-                (34, 65, 51, 100),
-                (66, 147, 101, 200),
-                (148, 228, 201, 300),
-                (229, 326, 301, 400),
-                (327, 9999, 401, 500)
+                (33, 65, 50, 100),
+                (65, 147, 100, 200),
+                (147, 228, 200, 300),
+                (228, 326, 300, 400),
+                (326, 9999, 400, 500)
             ],
             'nox ppb': [
                 (0, 21, 0, 50),
-                (22, 43, 51, 100),
-                (44, 96, 101, 200),
-                (97, 149, 201, 300),
-                (150, 213, 301, 400),
-                (214, 9999, 401, 500)
+                (21, 43, 50, 100),
+                (43, 96, 100, 200),
+                (96, 149, 200, 300),
+                (149, 213, 300, 400),
+                (213, 9999, 400, 500)
             ]
         }
 
@@ -212,7 +220,7 @@ class Preprocessing:
                 result = breakpoint_df[
                     (breakpoint_df["sensor_name"] == sensor_cols[k]) &
                     (breakpoint_df["CL"] <= j) &
-                    (breakpoint_df["CH"] >= j)
+                    (breakpoint_df["CH"] > j)
                     ]
 
                 if result.empty:
@@ -265,7 +273,8 @@ class Preprocessing:
         self.aggregate_city_level()
         self.AQI_Class_Labeler()
 
-p = Preprocessing("data/sensor_data.csv")  # use valid file name
+
+p = Preprocessing(r'D:\Arise\python\Mlops\project 1\data_pipeline\1common_sensors_long.csv')
 p.run()
 
 
