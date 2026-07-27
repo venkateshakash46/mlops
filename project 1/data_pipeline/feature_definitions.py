@@ -3,7 +3,7 @@ from feast.value_type import ValueType
 from feast.types import Float64, Int32, String
 
 Fs = FileSource(
-    path            = r"D:\Arise\python\Mlops\project 1\data_pipeline\Final_Pollution_Data.parquet",
+    path            = r"D:Final_Pollution_Data.parquet", # use the final file's path
     timestamp_field = "timestamp"
 )
 
