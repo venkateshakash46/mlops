@@ -2,7 +2,19 @@ from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
 from project1.Pipelines.serving_pipeline.predict import make_prediction
+from project1.Pipelines.serving_pipeline.production_data import (
+    save_production_data
+)
+from prometheus_client import generate_latest
+from fastapi.responses import Response
+import time
 
+from project1.Pipelines.serving_pipeline.predict import make_prediction
+from project1.Pipelines.serving_pipeline.Monitoring import (
+    prediction_requests,
+    prediction_errors,
+    prediction_latency
+)
 
 app = FastAPI(
     title="Pollution Prediction API",
@@ -38,10 +50,29 @@ def home():
 @app.post("/predict")
 def predict(data: PredictionInput):
 
-    save_production_data(data) ## Here we will store the user's request's features values in the data_production.csv
+    prediction_requests.inc()
 
-    result = make_prediction(data)
+    start_time = time.time()
 
-    return {
-        "prediction": result
-    }
+    try:
+        save_production_data(data) ## Here we will store the user's request's features values in the data_production.csv
+        result = make_prediction(data)
+
+        return {
+            "prediction": result
+        }
+
+    except Exception:
+        prediction_errors.inc()
+        raise
+
+    finally:
+        prediction_latency.observe(time.time() - start_time)
+
+@app.get("/metrics")
+def metrics():
+
+    return Response(
+        content=generate_latest(),
+        media_type="text/plain"
+    )
