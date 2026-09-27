@@ -38,6 +38,8 @@ def home():
 @app.post("/predict")
 def predict(data: PredictionInput):
 
+    save_production_data(data) ## Here we will store the user's request's features values in the data_production.csv
+
     result = make_prediction(data)
 
     return {
